@@ -20,8 +20,12 @@
   "type": "module",
   "dependencies": {
     "@koa/cors": "^5.0.0",
+    "jsonwebtoken": "^9.0.3",
     "koa": "^3.2.1",
     "koa-bodyparser": "^4.4.1",
     "koa-router": "^14.0.0"
+  },
+  "devDependencies": {
+    "mysql2": "^3.24.6"
   }
 }

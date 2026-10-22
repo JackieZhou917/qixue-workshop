@@ -3,12 +3,14 @@ import type { SubmitEvent } from 'react'
 import { Toast } from 'antd-mobile'
 import axios from '@/utils/http.ts'
 import { Md5 } from 'ts-md5'
+import { useNavigate } from 'react-router-dom'
 
 
 export default function Login() {
   const [loading, setLoading] = useState(false)
   const accountRef = useRef(null)
   const passwordRef = useRef(null)
+  const navigate = useNavigate()
 
   // 登录
   const login = async (e: SubmitEvent<HTMLFormElement>) => {
@@ -35,7 +37,15 @@ export default function Login() {
     setLoading(true)
 
     // 向后端发请求
-    axios.post('/auth/login', { account, password: Md5.hashStr(password) })
+    const res = await axios.post('/auth/login', { account, password: Md5.hashStr(password) })
+    setLoading(false)
+
+    // 存储两个长短token到浏览器的localStorage, 为同步代码
+    localStorage.setItem('access_token', res.data.user.access_token)
+    localStorage.setItem('refresh_token', res.data.user.refresh_token)
+
+    // 跳转到首页
+    navigate('/')
   }
   return (
     <form action="" onSubmit={login}>

@@ -5,6 +5,15 @@ axios.defaults.baseURL = 'http://localhost:3000'
 axios.defaults.timeout = 5000    // 超出5秒没有响应，就认为请求失败
 axios.defaults.headers.common['Content-Type'] = 'application/json'  // 设置请求头，指定请求体为json格式
 
+// 请求拦截器
+axios.interceptors.request.use((request) => {
+  const access_token = localStorage.getItem('access_token')
+  if(access_token){
+    request.headers['Authorization'] = access_token
+  }
+  return request
+})
+
 // 响应拦截器  ---  统一做错误处理
 axios.interceptors.response.use(
   (response) => {  // 响应成功 http状态码是200
