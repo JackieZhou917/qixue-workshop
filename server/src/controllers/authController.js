@@ -1,5 +1,6 @@
 import { findUserByAccount } from "../models/authModel.js"
 import { createToken } from "../utils/jwt.js"
+import { generateCaptcha } from "../utils/captcha.js"
 
 export async function login(ctx) {
   // 解析前端传递的参数
@@ -45,4 +46,14 @@ export async function login(ctx) {
     }
   }
 
+}
+
+export function getCaptcha(ctx) {
+  const captcha = generateCaptcha()
+  
+  ctx.body = {
+    captchaId: captcha.id,
+    captchaSvg: captcha.svg,
+    code: 1
+  }
 }
