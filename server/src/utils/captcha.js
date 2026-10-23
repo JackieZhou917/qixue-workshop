@@ -37,3 +37,24 @@ export function generateCaptcha() {
     svg: captcha.data
   }
 }
+
+export function verifyCaptcha(captchaId, captchaCode) {
+  const stored = captchaStore.get(captchaId)
+  if(!stored) {
+    return {
+      valid: false,
+      message: '验证码已过期'
+    }
+  }else if(captchaCode.toLocaleLowerCase() !== stored.text) {
+    return {
+      valid: false,
+      message: '验证码错误'
+    }
+  }else {
+    captchaStore.delete(captchaId)
+    return {
+      valid: true,
+      message: '验证码正确'
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import { findUserByAccount } from "../models/authModel.js"
 import { createToken } from "../utils/jwt.js"
-import { generateCaptcha } from "../utils/captcha.js"
+import { generateCaptcha, verifyCaptcha } from "../utils/captcha.js"
+import bcrypt from 'bcrypt'
 
 export async function login(ctx) {
   // 解析前端传递的参数
@@ -8,7 +9,8 @@ export async function login(ctx) {
   if(!account || !password){
     ctx.status = 400
     ctx.body = {
-      message: '账号或密码不能为空'
+      message: '账号或密码不能为空',
+      code: 0
     }
     return
   }
@@ -18,7 +20,8 @@ export async function login(ctx) {
   if(!user) {
     ctx.status = 400
     ctx.body = {
-      message: '账号不存在'
+      message: '账号不存在',
+      code: 0
     }
     return
   }
@@ -27,7 +30,8 @@ export async function login(ctx) {
   if(user.password !== password){
     ctx.status = 400
     ctx.body = {
-      message: '密码错误'
+      message: '密码错误',
+      code: 0
     }
     return
   }else {
@@ -47,6 +51,55 @@ export async function login(ctx) {
   }
 
 }
+
+export async function register(ctx) {
+  // 解析前端传递的参数
+  const { nickname, account, captchaCode, password, captchaId } = ctx.request.body
+  if(!nickname || !account ||  !password){
+    ctx.status = 400
+    ctx.body = {
+      message: '用户信息不完整',
+      code: 0
+    }
+    return
+  }
+
+  // 校验验证码是否传递
+  if(!captchaId || !captchaCode){
+    ctx.status = 400
+    ctx.body = {
+      message: '验证码不能为空',
+      code: 0
+    }
+    return
+  }
+  // 检验验证码是否合法
+  const captchaResult = verifyCaptcha(captchaId, captchaCode)
+  if(!captchaResult.valid) {
+    ctx.status = 400
+    ctx.body = {
+      message: captchaResult.message,
+      code: 0
+    }
+    return
+  }
+
+  // 校验账号是否已经注册过
+  const user = await findUserByAccount(account)
+  if(user) {
+    ctx.status = 400
+    ctx.body = {
+      message: '账号已存在',
+      code: 0
+    }
+    return
+  }
+
+  // 密码再次加密
+  const bcryptPassword = await bcrypt.hash(password, 10)
+  console.log(bcryptPassword)
+}
+
 
 export function getCaptcha(ctx) {
   const captcha = generateCaptcha()
