@@ -4,6 +4,9 @@ import Register from './Register.tsx'
 
 export default function index() {
   const [activeTab, setActiveTab] = useState('login')
+  const changeActiveTab : (tab: 'login' | 'register') => void = (tab) => {
+    setActiveTab(tab)
+  }
 
   return (
     <div className="min-h-screen p-5 flex items-center justify-center bg-linear-to-br from-[#E0F7FA] to-[#F8F8FF]">
@@ -39,7 +42,7 @@ export default function index() {
         </div>
         {/* 登录注册组件 */}
         {
-          activeTab === 'login' ? <Login /> : <Register />
+          activeTab === 'login' ? <Login /> : <Register changeActiveTab={changeActiveTab} />
         }
 
         {/* 第三方登录 */}

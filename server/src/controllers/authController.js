@@ -1,4 +1,4 @@
-import { findUserByAccount } from "../models/authModel.js"
+import { findUserByAccount, createUser } from "../models/authModel.js"
 import { createToken } from "../utils/jwt.js"
 import { generateCaptcha, verifyCaptcha } from "../utils/captcha.js"
 import bcrypt from 'bcrypt'
@@ -27,7 +27,8 @@ export async function login(ctx) {
   }
 
   // 校验密码
-  if(user.password !== password){
+  const isMatch = await bcrypt.compare(password, user.password)
+  if(!isMatch){
     ctx.status = 400
     ctx.body = {
       message: '密码错误',
@@ -54,8 +55,8 @@ export async function login(ctx) {
 
 export async function register(ctx) {
   // 解析前端传递的参数
-  const { nickname, account, captchaCode, password, captchaId } = ctx.request.body
-  if(!nickname || !account ||  !password){
+  const { nickName, account, captchaCode, password, captchaId } = ctx.request.body
+  if(!nickName || !account ||  !password){
     ctx.status = 400
     ctx.body = {
       message: '用户信息不完整',
@@ -97,7 +98,23 @@ export async function register(ctx) {
 
   // 密码再次加密
   const bcryptPassword = await bcrypt.hash(password, 10)
-  console.log(bcryptPassword)
+
+  // 写入数据库
+  try {
+    const insertRes = await createUser({ nickName, account, bcryptPassword })
+    ctx.body = {
+      code: 1,
+      user: insertRes,
+      message: '注册成功'
+    }
+  } catch (error) {
+    console.error('[register] 写入数据库失败:', error)
+    ctx.status = 500
+    ctx.body = {
+      code: 0,
+      message: '服务器异常, 注册失败'
+    }
+  }
 }
 
 

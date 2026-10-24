@@ -12,6 +12,8 @@ export default function Login() {
   const passwordRef = useRef(null)
   const navigate = useNavigate()
 
+
+
   // 登录
   const login = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()  // 阻止默认行为
@@ -37,15 +39,19 @@ export default function Login() {
     setLoading(true)
 
     // 向后端发请求
-    const res = await axios.post('/auth/login', { account, password: Md5.hashStr(password) })
-    setLoading(false)
+    try {
+      const res = await axios.post('/auth/login', { account, password: Md5.hashStr(password) })
+      setLoading(false)
 
-    // 存储两个长短token到浏览器的localStorage, 为同步代码
-    localStorage.setItem('access_token', res.data.user.access_token)
-    localStorage.setItem('refresh_token', res.data.user.refresh_token)
+      // 存储两个长短token到浏览器的localStorage, 为同步代码
+      localStorage.setItem('access_token', res.data.user.access_token)
+      localStorage.setItem('refresh_token', res.data.user.refresh_token)
 
-    // 跳转到首页
-    navigate('/')
+      // 跳转到首页
+      navigate('/')
+    } catch (error) {
+      setLoading(false)
+    }
   }
   return (
     <form action="" onSubmit={login}>

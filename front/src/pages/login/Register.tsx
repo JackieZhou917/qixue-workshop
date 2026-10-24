@@ -5,11 +5,11 @@ import { Toast } from 'antd-mobile'
 import { Md5 } from 'ts-md5'
 
 
-export default function Register() {
+export default function Register({ changeActiveTab }: { changeActiveTab: (tab: 'login' | 'register') => void }) {
   const [loading, setLoading] = useState(false);
   const [captchaSvg, setCaptchaSvg] = useState('')
   const [captchaId, setCaptchaId] = useState('')
-  const [nickname, setNickname] = useState('')
+  const [nickName, setNickName] = useState('')
   const [account, setAccount] = useState('')
   const [captchaCode, setCaptchaCode] = useState('')
   const [password, setPassword] = useState('')
@@ -24,7 +24,7 @@ export default function Register() {
 
   const register = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!nickname || !account || !captchaCode || !password) {
+    if (!nickName || !account || !captchaCode || !password) {
       Toast.show({
         icon: 'fail',
         content: '请填写完整信息',
@@ -45,14 +45,32 @@ export default function Register() {
 
     setLoading(true)
     // 发请求
-    const res = await axios.post('/auth/register', {
-      nickname,
-      account,
-      captchaCode,
-      password: Md5.hashStr(password),
-      captchaId
-    })
-    setLoading(false)
+
+    try {
+      const res = await axios.post('/auth/register', {
+        nickName,
+        account,
+        captchaCode,
+        password: Md5.hashStr(password),
+        captchaId
+      })
+      setLoading(false)
+      if (res.data.code !== 1) {
+        Toast.show({
+          icon: 'fail',
+          content: res.data.message
+        })
+        return
+      }
+      Toast.show({
+        icon: 'success',
+        content: '注册成功'
+      })
+      // 切换到登录组件
+      changeActiveTab('login')
+    } catch (error) {
+      setLoading(false)
+    }
   }
 
 
@@ -65,7 +83,7 @@ export default function Register() {
     <form action="" onSubmit={register}>
       <div className="relative mb-5">
         <i className="iconfont icon-zhanghao absolute left-4 top-1/2 -translate-y-1/2 text-[#888]"></i>
-        <input type="nickname" onChange={(e) => { setNickname(e.target.value) }} placeholder='请输入昵称' className='w-full py-2.5 px-5 pl-12 border-2 border-[#e0e0e0] rounded-2xl text-[15px] bg-[#fafafa] outline-none transition-all duration-500 ease focus:border-[#FF8C00] focus:shadow-[0_0_0_3px_rgba(255,140,0,0.2)] focus:bg-white' />
+        <input type="nickname" onChange={(e) => { setNickName(e.target.value) }} placeholder='请输入昵称' className='w-full py-2.5 px-5 pl-12 border-2 border-[#e0e0e0] rounded-2xl text-[15px] bg-[#fafafa] outline-none transition-all duration-500 ease focus:border-[#FF8C00] focus:shadow-[0_0_0_3px_rgba(255,140,0,0.2)] focus:bg-white' />
       </div>
       <div className="relative mb-5">
         <i className="iconfont icon-icophone absolute left-4 top-1/2 -translate-y-1/2 text-[#888]"></i>
