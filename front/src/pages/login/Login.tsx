@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { SubmitEvent } from 'react'
 import { Toast } from 'antd-mobile'
 import axios from '@/utils/http.ts'
@@ -6,12 +6,11 @@ import { Md5 } from 'ts-md5'
 import { useNavigate } from 'react-router-dom'
 
 
-export default function Login() {
+export default function Login({ user: { account, password}}) {
   const [loading, setLoading] = useState(false)
   const accountRef = useRef(null)
   const passwordRef = useRef(null)
   const navigate = useNavigate()
-
 
 
   // 登录
@@ -57,11 +56,11 @@ export default function Login() {
     <form action="" onSubmit={login}>
       <div className="relative mb-5">
         <i className="iconfont icon-zhanghao absolute left-4 top-1/2 -translate-y-1/2 text-[#888]"></i>
-        <input ref={accountRef} type="tel" placeholder='请输入手机号或邮箱' className='w-full py-2.5 px-5 pl-12 border-2 border-[#e0e0e0] rounded-2xl text-[15px] bg-[#fafafa] outline-none transition-all duration-500 ease focus:border-[#FF8C00] focus:shadow-[0_0_0_3px_rgba(255,140,0,0.2)] focus:bg-white' />
+        <input defaultValue={account} ref={accountRef} type="tel" placeholder='请输入手机号或邮箱' className='w-full py-2.5 px-5 pl-12 border-2 border-[#e0e0e0] rounded-2xl text-[15px] bg-[#fafafa] outline-none transition-all duration-500 ease focus:border-[#FF8C00] focus:shadow-[0_0_0_3px_rgba(255,140,0,0.2)] focus:bg-white' />
       </div>
       <div className="relative mb-5">
         <i className="iconfont icon-mima absolute left-4 top-1/2 -translate-y-1/2 text-[#888]"></i>
-        <input ref={passwordRef} type="password" placeholder='请输入密码' className='w-full py-2.5 px-5 pl-12 border-2 border-[#e0e0e0] rounded-2xl text-[15px] bg-[#fafafa] outline-none transition-all duration-500 ease focus:border-[#FF8C00] focus:shadow-[0_0_0_3px_rgba(255,140,0,0.2)] focus:bg-white' />
+        <input defaultValue={password} ref={passwordRef} type="password" placeholder='请输入密码' className='w-full py-2.5 px-5 pl-12 border-2 border-[#e0e0e0] rounded-2xl text-[15px] bg-[#fafafa] outline-none transition-all duration-500 ease focus:border-[#FF8C00] focus:shadow-[0_0_0_3px_rgba(255,140,0,0.2)] focus:bg-white' />
       </div>
       <div className="text-right mb-5">
         <a href="#" className="text-[#FF8C00]! text-sm no-underline font-semibold">忘记密码？</a>

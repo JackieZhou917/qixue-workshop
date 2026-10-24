@@ -2,10 +2,18 @@ import { useState } from "react"
 import Login from './Login.tsx'
 import Register from './Register.tsx'
 
+export interface UserData {
+  account: string
+  password: string
+}
+
 export default function index() {
   const [activeTab, setActiveTab] = useState('login')
-  const changeActiveTab : (tab: 'login' | 'register') => void = (tab) => {
+  const [user, setUser] = useState({})  // 从注册那得到的账号密码
+
+  const changeActiveTab : (tab: 'login' | 'register', userData: UserData) => void = (tab, userData) => {
     setActiveTab(tab)
+    setUser(userData)
   }
 
   return (
@@ -42,7 +50,7 @@ export default function index() {
         </div>
         {/* 登录注册组件 */}
         {
-          activeTab === 'login' ? <Login /> : <Register changeActiveTab={changeActiveTab} />
+          activeTab === 'login' ? <Login user={user as UserData}/> : <Register changeActiveTab={changeActiveTab} />
         }
 
         {/* 第三方登录 */}

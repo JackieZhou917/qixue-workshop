@@ -3,9 +3,10 @@ import type { SubmitEvent } from 'react'
 import axios from '@/utils/http.ts'
 import { Toast } from 'antd-mobile'
 import { Md5 } from 'ts-md5'
+import type { UserData } from './index.tsx'
 
 
-export default function Register({ changeActiveTab }: { changeActiveTab: (tab: 'login' | 'register') => void }) {
+export default function Register({ changeActiveTab }: { changeActiveTab: (tab: 'login' | 'register', userData: UserData) => void }) {
   const [loading, setLoading] = useState(false);
   const [captchaSvg, setCaptchaSvg] = useState('')
   const [captchaId, setCaptchaId] = useState('')
@@ -67,7 +68,7 @@ export default function Register({ changeActiveTab }: { changeActiveTab: (tab: '
         content: '注册成功'
       })
       // 切换到登录组件
-      changeActiveTab('login')
+      changeActiveTab('login', {account, password})
     } catch (error) {
       setLoading(false)
     }

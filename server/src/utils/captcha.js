@@ -4,7 +4,7 @@ import svgCaptcha  from 'svg-captcha'
 const captchaStore = new Map()
 
 // 验证码有效时长
-const CAPTCHA_EXPIRE_TIME = 60 * 1000
+const CAPTCHA_EXPIRE_TIME = 2 * 60 * 1000
 
 export function generateCaptcha() {
   const captcha = svgCaptcha.create({
