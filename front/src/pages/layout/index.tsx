@@ -14,7 +14,7 @@ export default function index() {
     const res = tabs.find(item => {
       return item.path === window.location.pathname
     })
-    return res.id
+    return res?.id || 'home'
   })
   const navigate = useNavigate()
   return (
