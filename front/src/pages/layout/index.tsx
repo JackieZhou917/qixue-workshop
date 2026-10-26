@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Outlet } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const tabs = [
   { id: 'home', path: '/home', text: '首页', icon: 'icon-shouye' },
@@ -7,17 +9,25 @@ const tabs = [
 ]
 
 export default function index() {
-  const [activeTab, setActivetab] = useState('home')
+  const [activeTab, setActivetab] = useState(() => {
+    // 从url中读到当前路由，根据路由判断当前选中的tab是哪个
+    const res = tabs.find(item => {
+      return item.path === window.location.pathname
+    })
+    return res.id
+  })
+  const navigate = useNavigate()
   return (
     <div className='min-h-screen'>
       <div className="layout-page pb-20">
         {/* 展示二级页面 */}
+        <Outlet></Outlet>
       </div>
 
-      <div className="bottom-nav fixed bottom-0 w-full flex bg-white z-100 px-10 h-[70px] border-t border-[#e5e5e5] shadow-[0_-2px_10px_rgba(0,0,0,0.05)] justify-between">
+      <div className="bottom-nav fixed bottom-0 w-full flex bg-white z-100 px-10 h-17.5 border-t border-[#e5e5e5] shadow-[0_-2px_10px_rgba(0,0,0,0.05)] justify-between">
         {
           tabs.map(tab => (
-            <div key={tab.id} className='flex flex-col justify-center items-center' onClick={() => setActivetab(tab.id)}>
+            <div key={tab.id}  className='flex flex-col justify-center items-center' onClick={() => {setActivetab(tab.id); navigate(tab.path)}}>
               {
                 tab.abnormal ?
                   (
