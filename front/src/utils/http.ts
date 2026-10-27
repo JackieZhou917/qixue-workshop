@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios'
 import { Toast } from 'antd-mobile'
 
 axios.defaults.baseURL = 'http://localhost:3000'
-axios.defaults.timeout = 5000    // 超出5秒没有响应，就认为请求失败
+axios.defaults.timeout = 50000    // 超出5秒没有响应，就认为请求失败
 axios.defaults.headers.common['Content-Type'] = 'application/json'  // 设置请求头，指定请求体为json格式
 
 // 请求拦截器
