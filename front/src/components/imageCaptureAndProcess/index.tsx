@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 
 type ThemeKey = 'default' | 'green'
 
-export default function index({ theme = 'default', children }) {
+export default function index({ theme = 'default', onRecognition, children }) {
   const imageInputRef = useRef(null)
   const [selectedImage, setSelectedImage] = useState(null)
 
@@ -20,12 +20,13 @@ export default function index({ theme = 'default', children }) {
 
   // 读取本地图片
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files[0]
-    if (file) {
+    const image = e.target.files[0]
+    if (image) {
       // 需要一个本地资源路径才能预览
-      const imageUrl = URL.createObjectURL(file)
+      const imageUrl = URL.createObjectURL(image)
       setSelectedImage(imageUrl)
       // 将图片资源交给LLM分析
+      onRecognition(image)
     }
   }
 

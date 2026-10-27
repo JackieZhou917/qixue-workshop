@@ -1,13 +1,15 @@
 import Koa from 'koa'
 import cors from '@koa/cors'
 import bodyParser from 'koa-bodyparser'
-import authRoutes from './routes/authRoutes.js'   // 引入auth相关的路由
+import allRoutes from './routes/index.js'
 const app = new Koa()
 
 
 app.use(cors())  // 允许跨域
 app.use(bodyParser())   // 让koa可以解析post传递的参数
-app.use(authRoutes.routes(), authRoutes.allowedMethods())   // 挂载auth相关的路由到app
+
+// 挂载所有路由到app
+allRoutes(app)
 
 
 
