@@ -37,7 +37,6 @@ export default function index() {
       })
       toast.close()
       setRecognitionResult(res.data.data)
-      console.log(res.data.data)
     } catch (error) {
       Toast.show({
         icon: 'fail',

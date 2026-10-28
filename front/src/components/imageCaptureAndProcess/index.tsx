@@ -1,9 +1,12 @@
 import React, { useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 type ThemeKey = 'default' | 'green'
 
 export default function index({ theme = 'default', onRecognition, children }) {
+  const navigate = useNavigate()
   const imageInputRef = useRef(null)
+  const videoRef = useRef(null)
   const [selectedImage, setSelectedImage] = useState(null)
 
   const themeConfig: Record<ThemeKey, { primary: string; gradient: string[] }> = {
@@ -35,10 +38,17 @@ export default function index({ theme = 'default', onRecognition, children }) {
     if (imageInputRef.current) imageInputRef.current.value = ''
   }
 
+  // 摄像头拍照
+  const takePhoto = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+    videoRef.current.srcObject = stream
+    videoRef.current.play()
+  }
+
   return (
     <div className='flex flex-col bg-linear-to-b from-[#f9fbff] via-[#f6f7fb] to-white font-sans'>
-      <header className='flex px-5 py-4 justify-between items-center sticky top-0 z-100'>
-        <button className='w-10 h-10 rounded-full bg-[#f0f0f0] font-semibold '>
+      <header className={`flex px-5 py-4 justify-between items-center sticky top-0 z-100 bg-[#f9f8f8]`}>
+        <button onClick={() => navigate(-1)} className='w-10 h-10 rounded-full bg-[#f0f0f0] font-semibold '>
           <i className="iconfont icon-fanhui text-sm!"></i>
         </button>
         <h1 className='text-xl text-[#333] font-semibold'>AI 拍照识物</h1>
@@ -75,6 +85,7 @@ export default function index({ theme = 'default', onRecognition, children }) {
           <button
             className="flex items-center justify-center gap-2 px-8 py-4 rounded-full text-lg font-semibold border-none cursor-pointer transition-all duration-300 ease min-w-37.5 text-white shadow-[0_8px_20px_rgba(255,122,69,0.3)] hover:bg-[#ff6b45] hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(255,122,69,0.4)]"
             style={{ backgroundColor: currentTheme.primary }}
+            onClick={takePhoto}
           >
             <i className="iconfont icon-zhaoxiangji text-2xl!"></i>
             拍照
@@ -92,6 +103,11 @@ export default function index({ theme = 'default', onRecognition, children }) {
         {/* 图片描述，不同的场景这里的结构不一样 */}
         {children}
       </main>
+
+      {/* 摄像头视频 */}
+      <div className='fixed w-full h-full flex items-center justify-center'>
+        <video ref={videoRef} style={{ aspectRatio: '4/3', objectFit: 'contain' }}></video>
+      </div>
     </div>
   )
 }
