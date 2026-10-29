@@ -7,7 +7,9 @@ export default function index({ theme = 'default', onRecognition, children }) {
   const navigate = useNavigate()
   const imageInputRef = useRef(null)
   const videoRef = useRef(null)
+  const canvasRef = useRef(null)
   const [selectedImage, setSelectedImage] = useState(null)
+  const [isTakingPhoto, setIsTakingPhoto] = useState(false)
 
   const themeConfig: Record<ThemeKey, { primary: string; gradient: string[] }> = {
     default: {
@@ -38,15 +40,56 @@ export default function index({ theme = 'default', onRecognition, children }) {
     if (imageInputRef.current) imageInputRef.current.value = ''
   }
 
-  // 摄像头拍照
-  const takePhoto = async () => {
+  // 打开摄像头
+  const openCamera = async () => {
+    // 展示拍照界面
+    setIsTakingPhoto(true)
+    // 获取摄像头权限
     const stream = await navigator.mediaDevices.getUserMedia({ video: true })
     videoRef.current.srcObject = stream
     videoRef.current.play()
   }
 
+  // 关闭拍照界面
+  const closeCamera = () => {
+    setIsTakingPhoto(false)
+    // 关闭视频流
+    videoRef.current.pause()
+    // 让摄像头停止工作
+    videoRef.current.srcObject.getTracks().forEach(track => track.stop())
+
+  }
+
+  // 拍照
+  const takePhoto = () => {
+    // 将video播放的内容截屏保留
+    // 将视频中的某一帧，绘制在画布上，再转为图片
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
+    canvas.width = videoRef.current.videoWidth
+    canvas.height = videoRef.current.videoHeight
+    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height)
+    // 关闭拍照界面, 停止摄像头工作
+    videoRef.current.pause()
+    videoRef.current.srcObject.getTracks().forEach(track => track.stop())
+
+    // 得到一张图片
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const imageUrl = URL.createObjectURL(blob)
+        // 预览
+        setIsTakingPhoto(false)
+        setSelectedImage(imageUrl)
+        // 将blob资源转为文件资源
+        const img = new File([blob], 'capture-image.jpg', { type: 'image/jpeg' })
+        onRecognition(img)  // 传给后端让LLM解析
+      }
+    }, 'image/jpeg', 0.8)
+
+  }
+
   return (
-    <div className='flex flex-col bg-linear-to-b from-[#f9fbff] via-[#f6f7fb] to-white font-sans'>
+    <div className= 'flex flex-col bg-linear-to-b from-[#f9fbff] via-[#f6f7fb] to-white font-sans'>
       <header className={`flex px-5 py-4 justify-between items-center sticky top-0 z-100 bg-[#f9f8f8]`}>
         <button onClick={() => navigate(-1)} className='w-10 h-10 rounded-full bg-[#f0f0f0] font-semibold '>
           <i className="iconfont icon-fanhui text-sm!"></i>
@@ -85,7 +128,7 @@ export default function index({ theme = 'default', onRecognition, children }) {
           <button
             className="flex items-center justify-center gap-2 px-8 py-4 rounded-full text-lg font-semibold border-none cursor-pointer transition-all duration-300 ease min-w-37.5 text-white shadow-[0_8px_20px_rgba(255,122,69,0.3)] hover:bg-[#ff6b45] hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(255,122,69,0.4)]"
             style={{ backgroundColor: currentTheme.primary }}
-            onClick={takePhoto}
+            onClick={openCamera}
           >
             <i className="iconfont icon-zhaoxiangji text-2xl!"></i>
             拍照
@@ -105,9 +148,17 @@ export default function index({ theme = 'default', onRecognition, children }) {
       </main>
 
       {/* 摄像头视频 */}
-      <div className='fixed w-full h-full flex items-center justify-center'>
+      <div className={` ${isTakingPhoto ? 'block' : 'hidden'} fixed w-full h-full flex flex-col gap-20 items-center justify-center bg-black z-999`}>
+        <div onClick={closeCamera} className="close absolute top-3 left-3 text-white cursor-pointer">
+          <i className="iconfont icon-close text-3xl! text-white"></i>
+        </div>
         <video ref={videoRef} style={{ aspectRatio: '4/3', objectFit: 'contain' }}></video>
+        <button onClick={takePhoto}>
+          <i className="iconfont icon-paizhao text-5xl! text-white"></i>
+        </button>
       </div>
+
+      <canvas ref={canvasRef} className='hidden'></canvas>
     </div>
   )
 }
