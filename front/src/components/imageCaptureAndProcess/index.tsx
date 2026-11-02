@@ -3,7 +3,14 @@ import { useNavigate } from 'react-router-dom'
 
 type ThemeKey = 'default' | 'green'
 
-export default function index({ theme = 'default', onRecognition, children }) {
+interface Props {
+  theme?: ThemeKey
+  handleByAI: (image: File) => void
+  children?: React.ReactNode
+  title: string
+}
+
+export default function index({ theme = 'default', handleByAI, children, title }: Props) {
   const navigate = useNavigate()
   const imageInputRef = useRef(null)
   const videoRef = useRef(null)
@@ -31,7 +38,7 @@ export default function index({ theme = 'default', onRecognition, children }) {
       const imageUrl = URL.createObjectURL(image)
       setSelectedImage(imageUrl)
       // 将图片资源交给LLM分析
-      onRecognition(image)
+      handleByAI(image)
     }
   }
 
@@ -82,7 +89,7 @@ export default function index({ theme = 'default', onRecognition, children }) {
         setSelectedImage(imageUrl)
         // 将blob资源转为文件资源
         const img = new File([blob], 'capture-image.jpg', { type: 'image/jpeg' })
-        onRecognition(img)  // 传给后端让LLM解析
+        handleByAI(img)  // 传给后端让LLM解析
       }
     }, 'image/jpeg', 0.8)
 
@@ -94,7 +101,7 @@ export default function index({ theme = 'default', onRecognition, children }) {
         <button onClick={() => navigate(-1)} className='w-10 h-10 rounded-full bg-[#f0f0f0] font-semibold '>
           <i className="iconfont icon-fanhui text-sm!"></i>
         </button>
-        <h1 className='text-xl text-[#333] font-semibold'>AI 拍照识物</h1>
+        <h1 className='text-xl text-[#333] font-semibold'>{title}</h1>
         <div className='w-10 h-10'></div>
       </header>
 

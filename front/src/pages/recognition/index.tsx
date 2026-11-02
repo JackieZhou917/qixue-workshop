@@ -2,6 +2,7 @@ import ImageCaptureAndProcess from '@/components/imageCaptureAndProcess'
 import { Toast } from 'antd-mobile'
 import axios from '@/utils/http.ts'
 import { useState, useRef } from 'react'
+import { fileToBase64 } from '@/utils/base64'
 
 interface RecognitionResult {
   description?: string
@@ -18,12 +19,13 @@ export default function index() {
     // 跟后端通信
     try {
       // 将图片处理成 base64
-      const dataUrl = await new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.readAsDataURL(image)
-        reader.onload = () => resolve(reader.result)
-        reader.onerror = (err) => reject(err)
-      })
+      // const dataUrl = await new Promise((resolve, reject) => {
+      //   const reader = new FileReader()
+      //   reader.readAsDataURL(image)
+      //   reader.onload = () => resolve(reader.result)
+      //   reader.onerror = (err) => reject(err)
+      // })
+      const dataUrl = await fileToBase64(image)
       // 显示AI识别中
       const toast = Toast.show({
         icon: 'loading',
@@ -46,7 +48,7 @@ export default function index() {
   }
 
   return (
-    <ImageCaptureAndProcess theme='default' onRecognition={onRecognition} >
+    <ImageCaptureAndProcess theme='default' handleByAI={onRecognition} title='AI识物'>
       <div className='bg-white rounded-[14px] p-6 shadow-[0_10px_26px_rgba(0,0,0,0.05)] animate-[fadeIn_0.5s_ease]'>
         <div className='flex justify-between mb-5 items-center'>
           <h2 className='text-lg font-bold text-[#333]'>识别结果：</h2>

@@ -5,6 +5,7 @@ import AiChat from './pages/aiChat'
 import Home from './pages/home'
 import Mine from './pages/mine'
 import Recognition from './pages/recognition'
+import LearnWords from './pages/learnWords'
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
           <Route path='/ai' element={<AiChat />}></Route>
           <Route path='/mine' element={<Mine />}></Route>
           <Route path='/recognition' element={<Recognition />}></Route>
+          <Route path='/learn-words' element={<LearnWords />}></Route>
         </Route>
       </Routes>
     </BrowserRouter>
