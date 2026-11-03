@@ -6,6 +6,7 @@ import Home from './pages/home'
 import Mine from './pages/mine'
 import Recognition from './pages/recognition'
 import LearnWords from './pages/learnWords'
+import LearnPoems from './pages/learnPoems'
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path='/mine' element={<Mine />}></Route>
           <Route path='/recognition' element={<Recognition />}></Route>
           <Route path='/learn-words' element={<LearnWords />}></Route>
+          <Route path='/learn-poems' element={<LearnPoems />}></Route>
         </Route>
       </Routes>
     </BrowserRouter>
