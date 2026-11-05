@@ -1,16 +1,15 @@
-import axios from 'axios'
-
-const baseUrl = 'https://poetry.palemoky.com'
+import { getDailyPoem } from '../services/poemService.js'
 // 今日推荐
 export async function recommendPoem(ctx) {
-  const api = '/api/poems/random'
+  
   try {
-    const res = await axios.get(baseUrl + api)
-    console.log(res.data.data)
+    // const res = await axios.get(baseUrl + api)
+    // console.log(res.data.data)
+    const poem = await getDailyPoem()
     ctx.status = 200
     ctx.body = {
       code: 1,
-      data: res.data.data
+      data: poem
     }
   } catch (error) {
     ctx.status = 500

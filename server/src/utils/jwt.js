@@ -27,7 +27,7 @@ export function verifyToken() {
       ctx.status = 402
       ctx.body = {
         code: 0,
-        message: '请重新登录'
+        message: '无权限，请先登录'
       }
     }
   }

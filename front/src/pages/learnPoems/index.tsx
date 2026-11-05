@@ -87,13 +87,10 @@ export default function LearnPoem() {
         }
       })
       setTitleList(titles)
-
       Toast.clear()
-
     } catch (error) {
 
     }
-
   }
 
   // 获取插图

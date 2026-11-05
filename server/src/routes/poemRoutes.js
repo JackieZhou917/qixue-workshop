@@ -8,7 +8,7 @@ const router = new Router({
   prefix: '/poem',  // 路由前缀
  })
 
-// 今日推荐
+// 获取每日推荐的诗词 (带 Redis 缓存)
 router.get('/recommend', verifyToken(), recommendPoem)
 
 

@@ -43,6 +43,8 @@ export default function Login({ user: { account, password}}) {
       setLoading(false)
 
       // 存储两个长短token到浏览器的localStorage, 为同步代码
+      localStorage.setItem('userId', res.data.user.id)
+      localStorage.setItem('account', res.data.user.account)
       localStorage.setItem('access_token', res.data.user.access_token)
       localStorage.setItem('refresh_token', res.data.user.refresh_token)
 
