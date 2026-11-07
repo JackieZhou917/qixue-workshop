@@ -1,5 +1,5 @@
 import Router from 'koa-router'
-import { recommendPoem } from '../controllers/poemContoller.js'
+import { recommendPoem, searchPoem } from '../controllers/poemContoller.js'
 import { verifyToken } from '../utils/jwt.js'
 
 
@@ -10,6 +10,9 @@ const router = new Router({
 
 // 获取每日推荐的诗词 (带 Redis 缓存)
 router.get('/recommend', verifyToken(), recommendPoem)
+
+// 搜索诗词
+router.get('/search', verifyToken(), searchPoem)
 
 
 export default router

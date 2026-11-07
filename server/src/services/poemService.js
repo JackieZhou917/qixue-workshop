@@ -83,3 +83,14 @@ export async function startDailyRefreshJob() {
     timezone: 'Asia/Shanghai'
   })
 }
+
+// 搜索诗词
+export async function searchPoemData(keyword) {
+  try {
+    const api = '/api/search'
+    const res = await axios.get(`${baseUrl}${api}?q=${keyword}`)
+    return res.data.data || []
+  } catch (error) {
+    
+  }
+}

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from '@/utils/http.ts'
 import { Toast } from "antd-mobile";
-// import debounce from 'lodash/debounce'
+import debounce from 'lodash/debounce'
 
 interface RecommendPoem {
   author?: { id: number, name: string },
@@ -150,8 +150,7 @@ export default function LearnPoem() {
 
       {/* 搜索框 */}
       <div className="px-6 mt-8 relative">
-        {/* <input onChange={debounce(handleSearch, 1500)} type="text" placeholder="搜索古诗词..." className="w-full h-10 rounded-full border border-[#dbe8f8] bg-white flex items-center px-5 text-gray-400 shadow-sm" /> */}
-        <input onChange={handleSearch} type="text" placeholder="搜索古诗词..." className="w-full h-10 rounded-full border border-[#dbe8f8] bg-white flex items-center px-5 text-gray-400 shadow-sm" />
+        <input onChange={debounce(handleSearch, 1500)} type="text" placeholder="搜索古诗词..." className="w-full h-10 rounded-full border border-[#dbe8f8] bg-white flex items-center px-5 text-gray-400 shadow-sm" />
         {
           titleList.length > 0 && (
             <ul className="max-h-50 overflow-y-scroll absolute top-full z-9 bg-white left-1/2 -translate-x-1/2 w-8/10 px-6 shadow-md py-4 flex flex-col gap-2 rounded-2xl">
