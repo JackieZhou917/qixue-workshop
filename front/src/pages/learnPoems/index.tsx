@@ -61,6 +61,24 @@ export default function LearnPoem() {
     }
   }
 
+  async function getRefreshPoem() {
+    Toast.show({
+      icon: 'loading',
+      content: '加载中...',
+      duration: 0,
+      maskClickable: false
+    })
+    try {
+      const changedRes = await axios.get('/poem/change')
+      setRecommendPoem(changedRes.data.data || {})
+      Toast.clear()
+      return changedRes
+    } catch (error) {
+      console.log(error);
+      throw error
+    }
+  }
+
   // 搜索
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -114,6 +132,12 @@ export default function LearnPoem() {
     if (i === 3 && audioRef.current) {
       audioRef.current.src = illustrationObj.voice
       audioRef.current.play()
+    } else if (i === 0){
+      getRefreshPoem().then((currentPoem) => {
+      // console.log('该获取插图了', currentPoem);
+      setIllustrationObj({} as IllustrationObj)
+      getPoemIllustration(currentPoem.data.data)
+    })
     }
   }
 

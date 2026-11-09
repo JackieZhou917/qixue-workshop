@@ -20,7 +20,7 @@ const baseUrl = 'https://poetry.palemoky.com'
 // 获取随机古诗词
 async function fetchRandomPoem() {
   const api = '/api/poems/random'
-  const res = await axios.get(baseUrl+api)
+  const res = await axios.get(baseUrl + api)
   return res.data.data
 }
 
@@ -29,15 +29,14 @@ export async function refreshDailyPoem() {
   try {
     // 使用 SETNX 获取分布式锁，10s (防止频繁更新Redis缓存)
     const lockAcquired = await redis.setnx(DAILY_POEM_LOCK_KEY, 1, 'EX', 10, 'NX')
-    if(!lockAcquired) {  // 锁已被占用, 有其他进程正在修改缓存数据
+    if (!lockAcquired) {  // 锁已被占用, 有其他进程正在修改缓存数据
       return null
     }
-    const poem  = await fetchRandomPoem()
-    if(poem) {
+    const poem = await fetchRandomPoem()
+    if (poem) {
       await redis.set(DAILY_POEM_KEY, JSON.stringify(poem))  // 修改了Redis中的缓存
-      // 释放锁
-      await redis.del(DAILY_POEM_LOCK_KEY)
-    } 
+      await redis.del(DAILY_POEM_ILLUSTRATION_KEY)  // 清除插图缓存
+    }
     // 释放锁
     await redis.del(DAILY_POEM_LOCK_KEY)
     return poem
@@ -69,21 +68,19 @@ async function fetchPoemIllustration({ title, content, dynasty, author }) {
   return res.data
 }
 
-
-
 // 返回每日推荐
 export async function getDailyPoem() {
-  
+
   try {
     // 1. 先查 Redis 缓存
     const cachedPoem = await redis.get(DAILY_POEM_KEY)
-    if(cachedPoem) {
+    if (cachedPoem) {
       return JSON.parse(cachedPoem)
     }
 
     // 2. 没有缓存
     const poem = await fetchRandomPoem()
-    if(!poem) {
+    if (!poem) {
       throw new Error('从诗泉API获取数据失败')
     }
 
@@ -98,20 +95,32 @@ export async function getDailyPoem() {
 
 export async function getPoemIllustrationFromCoze({ title, content, dynasty, author }) {
   try {
-    // 1. 先查 Redis 缓存
-    const cachedIllustration = await redis.get(DAILY_POEM_ILLUSTRATION_KEY)
-    if(cachedIllustration) {
-      return JSON.parse(cachedIllustration)
+    // 查缓存看是不是每日推荐那首诗
+    const cachedPoem = await redis.get(DAILY_POEM_KEY)
+    if (JSON.parse(cachedPoem).content.join() !== content.join()) {
+      // 此时缓存中的诗词不是每日推荐那首诗，需要重新获取插图
+      const illustration = await fetchPoemIllustration({ title, content, dynasty, author })
+      if (!illustration) {
+        throw new Error('从coze API获取插图失败')
+      }
+      return illustration
+    } else {
+      // 1. 先查 Redis 缓存
+      const cachedIllustration = await redis.get(DAILY_POEM_ILLUSTRATION_KEY)
+      if (cachedIllustration) {
+        return JSON.parse(cachedIllustration)
+      }
+
+      // 2. 没有缓存
+      const illustrationRes = await fetchPoemIllustration({ title, content, dynasty, author })
+      if (!illustrationRes) {
+        throw new Error('从coze API获取插图失败')
+      }
+      // 3. 写入缓存
+      await redis.set(DAILY_POEM_ILLUSTRATION_KEY, JSON.stringify(illustrationRes))
+      return illustrationRes
     }
 
-    // 2. 没有缓存
-    const illustrationRes = await fetchPoemIllustration({ title, content, dynasty, author })
-    if(!illustrationRes) {
-      throw new Error('从coze API获取插图失败')
-    }
-    // 3. 写入缓存
-    await redis.set(DAILY_POEM_ILLUSTRATION_KEY, JSON.stringify(illustrationRes))
-    return illustrationRes
   } catch (error) {
     console.error('获取插图失败: ', error.message)
     throw error
@@ -136,6 +145,24 @@ export async function searchPoemData(keyword) {
     const res = await axios.get(`${baseUrl}${api}?q=${keyword}`)
     return res.data.data || []
   } catch (error) {
-    
+
+  }
+}
+
+// 换一首诗词
+export async function changePoem() {
+  try {
+    const poem = await fetchRandomPoem()
+    if (!poem) {
+      throw new Error('从诗泉API获取数据失败')
+    }
+    // 3. 写入缓存
+    await redis.set(DAILY_POEM_KEY, JSON.stringify(poem))
+    await redis.del(DAILY_POEM_ILLUSTRATION_KEY)
+    return poem
+
+  } catch (error) {
+    console.error('换一首诗词失败: ', error.message)
+    throw error
   }
 }

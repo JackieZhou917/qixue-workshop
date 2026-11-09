@@ -3,6 +3,7 @@ import cors from '@koa/cors'
 import bodyParser from 'koa-bodyparser'
 import allRoutes from './routes/index.js'
 import dotenv from 'dotenv'
+import { startDailyRefreshJob} from './services/poemService.js'
 const app = new Koa()
 
 // 让node 能够读到环境文件
@@ -19,5 +20,6 @@ allRoutes(app)
 
 
 app.listen(3000, () => {
+  startDailyRefreshJob()
   console.log('服务已启动在3000 端口')
 })

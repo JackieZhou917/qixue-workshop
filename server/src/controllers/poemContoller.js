@@ -1,4 +1,4 @@
-import { getDailyPoem, searchPoemData, getPoemIllustrationFromCoze } from '../services/poemService.js'
+import { getDailyPoem, searchPoemData, getPoemIllustrationFromCoze, changePoem} from '../services/poemService.js'
 // 今日推荐
 export async function recommendPoem(ctx) {
 
@@ -79,6 +79,24 @@ export async function getPoemIllustration(ctx) {
     ctx.body = {
       code: 0,
       message: '生成插图失败'
+    }
+  }
+}
+
+// 换一首诗词
+export async function changeDailyPoem(ctx) {
+  try {
+    const poem = await changePoem()
+    ctx.body = {
+      code: 1,
+      message: '换一首诗词成功',
+      data: poem
+    }
+  } catch (error) {
+    ctx.status = 500
+    ctx.body = {
+      code: 0,
+      message: '换一首诗词失败'
     }
   }
 }
