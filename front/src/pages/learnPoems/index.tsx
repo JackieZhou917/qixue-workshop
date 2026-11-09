@@ -15,7 +15,7 @@ interface RecommendPoem {
 
 interface IllustrationObj {
   analysis: string,
-  img_arr: string[],
+  imgArr: string[],
   run_id: string,
   title: string,
   voice: string
@@ -89,7 +89,10 @@ export default function LearnPoem() {
       setTitleList(titles)
       Toast.clear()
     } catch (error) {
-
+      Toast.show({
+      icon: 'fail',
+      content: '搜索失败, 无相关诗词',
+    })
     }
   }
 
@@ -126,7 +129,7 @@ export default function LearnPoem() {
 
   useEffect(() => {
     getRecommendPoem().then((currentPoem) => {
-      console.log('该获取插图了', currentPoem);
+      // console.log('该获取插图了', currentPoem);
       getPoemIllustration(currentPoem.data.data)
     })
   }, []);
@@ -197,7 +200,7 @@ export default function LearnPoem() {
         <div className="grid grid-cols-2 gap-2 rounded-2xl overflow-hidden">
           {/* 插图加载中 */}
           {
-            !illustrationObj.img_arr?.length ?
+            !illustrationObj.imgArr?.length ?
               (
                 [...Array(4)].map((_item, index) => (
                   <div key={index} className="relative aspect-square bg-[#e8f3ff] flex justify-center items-center">
@@ -209,7 +212,7 @@ export default function LearnPoem() {
                 ))
               ) :
               (
-                illustrationObj.img_arr?.map((img, index) => (
+                illustrationObj.imgArr?.map((img, index) => (
                   <div key={index} className="relative aspect-square bg-[#e8f3ff]">
                     <img src={img} className="w-full h-full object-cover" />
                     {/* 序号 */}

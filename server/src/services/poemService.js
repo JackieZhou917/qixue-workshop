@@ -10,6 +10,8 @@ import cron from 'node-cron'
 
 // Redis Key
 const DAILY_POEM_KEY = 'daily_poem'
+// 插图缓存Key
+const DAILY_POEM_ILLUSTRATION_KEY = 'daily_poem_illustration'
 // 分布式锁Key
 const DAILY_POEM_LOCK_KEY = 'daily_poem_lock'
 // 诗泉 API地址
@@ -46,6 +48,27 @@ export async function refreshDailyPoem() {
   }
 }
 
+async function fetchPoemIllustration({ title, content, dynasty, author }) {
+  const url = 'https://g57gnjdsx7.coze.site/run'
+  const headers = {
+    'Authorization': `Bearer ${process.env.COZE_POEM_ILLUSTRATION_TOKEN}`,
+    'Content-Type': 'application/json',
+  }
+  const data = {
+    title,
+    content,
+    dynasty,
+    author,
+  }
+  const res = await axios({
+    method: 'POST',
+    url,
+    headers,
+    data: JSON.stringify(data),
+  })
+  return res.data
+}
+
 
 
 // 返回每日推荐
@@ -69,6 +92,28 @@ export async function getDailyPoem() {
     return poem
   } catch (error) {
     console.error('获取今日推荐失败: ', error.message)
+    throw error
+  }
+}
+
+export async function getPoemIllustrationFromCoze({ title, content, dynasty, author }) {
+  try {
+    // 1. 先查 Redis 缓存
+    const cachedIllustration = await redis.get(DAILY_POEM_ILLUSTRATION_KEY)
+    if(cachedIllustration) {
+      return JSON.parse(cachedIllustration)
+    }
+
+    // 2. 没有缓存
+    const illustrationRes = await fetchPoemIllustration({ title, content, dynasty, author })
+    if(!illustrationRes) {
+      throw new Error('从coze API获取插图失败')
+    }
+    // 3. 写入缓存
+    await redis.set(DAILY_POEM_ILLUSTRATION_KEY, JSON.stringify(illustrationRes))
+    return illustrationRes
+  } catch (error) {
+    console.error('获取插图失败: ', error.message)
     throw error
   }
 }

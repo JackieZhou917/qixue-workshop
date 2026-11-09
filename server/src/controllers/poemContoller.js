@@ -1,4 +1,4 @@
-import { getDailyPoem, searchPoemData } from '../services/poemService.js'
+import { getDailyPoem, searchPoemData, getPoemIllustrationFromCoze } from '../services/poemService.js'
 // 今日推荐
 export async function recommendPoem(ctx) {
 
@@ -33,6 +33,13 @@ export async function searchPoem(ctx) {
 
   try {
     const searchResult = await searchPoemData(q.trim())
+    if (searchResult.length === 0) {
+      ctx.status = 404
+      ctx.body = {
+        code: 0,
+        message: '未找到相关诗词',
+      }
+    }
     ctx.body = {
       code: 1,
       message: '搜索成功',
@@ -43,6 +50,35 @@ export async function searchPoem(ctx) {
     ctx.body = {
       code: 0,
       message: error
+    }
+  }
+}
+
+// 获取插图
+export async function getPoemIllustration(ctx) {
+  const { title, content, dynasty, author } = ctx.request.body
+  if (!title || !content) {
+    ctx.body = {
+      code: 0,
+      message: '生成插图失败'
+    }
+    return
+  }
+
+  // 接入coze API
+  try {
+    const illustrationRes = await getPoemIllustrationFromCoze({ title, content, dynasty, author })
+    ctx.body = {
+      code: 1,
+      message: '生成插图成功',
+      data: illustrationRes
+    }
+
+  } catch (error) {
+    ctx.status = 500
+    ctx.body = {
+      code: 0,
+      message: '生成插图失败'
     }
   }
 }
