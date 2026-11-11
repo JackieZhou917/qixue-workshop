@@ -103,3 +103,11 @@ coze是一个低代码平台，提供了两种方案创建工作流：
 
 - 先在电脑上安装 redis 服务
 - pnpm install ioredis node-cron
+
+
+# RAG 处理 context engineering
+1. pnpm i ollama vectra
+2. 初始化RAG数据库
+3. 往RAG数据库中增加数据
+4. 往RAG数据库中移除数据
+5. 往RAG数据库中查询相似度高的数据

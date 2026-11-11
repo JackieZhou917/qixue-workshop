@@ -60,9 +60,12 @@ export async function aiChat(ctx) {
       const chunkValueObj = JSON.parse(trimmed)
 
       // \n\n 是标准的SSE需要的换行, 每条data必须以空行结尾, 否则事件不会派发, 会堆积到下一个空行一起发出
-      if (chunkValueObj.thinking) {
-        ctx.res.write(`data: ${chunkValueObj.thinking}\n\n`)
-      } else if (chunkValueObj.response) {
+      // if (chunkValueObj.thinking) {
+      //   ctx.res.write(`data: ${chunkValueObj.thinking}\n\n`)
+      // } else if (chunkValueObj.response) {
+      //   ctx.res.write(`data: ${chunkValueObj.response}\n\n`)
+      // }
+      if (chunkValueObj.response) {
         ctx.res.write(`data: ${chunkValueObj.response}\n\n`)
       }
     }

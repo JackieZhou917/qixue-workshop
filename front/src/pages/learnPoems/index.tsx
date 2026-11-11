@@ -251,7 +251,7 @@ export default function LearnPoem() {
       </section>
 
       {/* 赏析 */}
-      <section className="mx-5 mt-6 bg-[#f4f9ff] rounded-[24px] p-5">
+      <section className="mx-5 mt-6 bg-[#f4f9ff] rounded-3xl p-5">
         <div className="flex items-center gap-3 text-xl font-bold mb-5">
           📖
           诗词赏析
@@ -263,7 +263,7 @@ export default function LearnPoem() {
       </section>
 
       {/* 底部操作 */}
-      <footer className="mx-5 mt-8 bg-white rounded-[25px] shadow-sm h-[90px] flex justify-around items-center">
+      <footer className="mx-5 mt-8 bg-white rounded-[25px] shadow-sm h-22.5 flex justify-around items-center">
         {[
           ["↻", "换一首"],
           ["☆", "收藏"],
