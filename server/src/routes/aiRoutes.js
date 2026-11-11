@@ -7,6 +7,6 @@ const router = new Router({
 })
 
 // ai聊天
-router.get('/chat', aiChat)
+router.get('/chat',  aiChat)
 
  export default router

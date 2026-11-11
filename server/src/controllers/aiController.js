@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getRagHistory } from '../services/aiService.js'
 
 export async function aiChat(ctx) {
   const { message } = ctx.request.query
@@ -22,11 +23,15 @@ export async function aiChat(ctx) {
   // 向OLLAMA发送请求
   const url = process.env.LLM_BASE_URL + process.env.LLM_REST_URL
   const modelName = process.env.LLM_MODEL_NAME
+  // 向量数据库中招相关话题
+  const messages = await getRagHistory(message)
+  console.log(messages)
+
   const res = await axios.post(
     url,
     {
       model: modelName,
-      prompt: message,
+      messages,
       stream: true,
     },
     {
@@ -44,7 +49,7 @@ export async function aiChat(ctx) {
   let finished = false
   let buffer = ''  // 缓存不完整的行
 
-  while(!finished) {
+  while (!finished) {
     const { done, value } = await reader.read()
     finished = done
     buffer += decoder.decode(value, { stream: true })
@@ -57,18 +62,24 @@ export async function aiChat(ctx) {
     for (const line of lines) {
       const trimmed = line.trim()
       if (!trimmed) continue
-      const chunkValueObj = JSON.parse(trimmed)
 
-      // \n\n 是标准的SSE需要的换行, 每条data必须以空行结尾, 否则事件不会派发, 会堆积到下一个空行一起发出
-      // if (chunkValueObj.thinking) {
-      //   ctx.res.write(`data: ${chunkValueObj.thinking}\n\n`)
-      // } else if (chunkValueObj.response) {
-      //   ctx.res.write(`data: ${chunkValueObj.response}\n\n`)
-      // }
-      if (chunkValueObj.response) {
-        ctx.res.write(`data: ${chunkValueObj.response}\n\n`)
+      try {
+        const chunkValueObj = JSON.parse(trimmed)
+
+        // \n\n 标准的SSE需要的换行
+        if (chunkValueObj.message.thinking) {
+          ctx.res.write(`data: ${chunkValueObj.message.thinking}\n\n`)
+        } else {
+          ctx.res.write(`data: ${chunkValueObj.message.content}\n\n`)
+        }
+        // if (chunkValueObj.message.content) {
+        //   ctx.res.write(`data: ${chunkValueObj.message.content}\n\n`)
+        // }
+      } catch (err) {
+        console.error('解析 JSON 失败，原始数据:', line, err)
       }
     }
+
   }
 
   // 通知前端，资源传输完毕

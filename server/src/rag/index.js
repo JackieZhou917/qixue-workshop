@@ -52,12 +52,16 @@ export class LocalRAG {
     // 新问题处理成向量，再到RAG数据库中招相似度最高的3条
     const vector = ((await getEmbeddings(text)).map(item => item.vector)).flat(Infinity)
     const res = await this.db.queryItems(vector, text, topK)
-    console.log(res)
-    return res
+    return res.map(({ item, score }) => ({
+      text: item.metadata.text,
+      query: text,
+      simularity: score,
+      id: item.id
+    }))
   }
 }
 
-const rag = new LocalRAG()
-await rag.init()
-await rag.add('你好，我是彭于晏')
-rag.query('我是谁')
+// const rag = new LocalRAG()
+// await rag.init()
+// await rag.add('你好，我是彭于晏')
+// rag.query('我是谁')
