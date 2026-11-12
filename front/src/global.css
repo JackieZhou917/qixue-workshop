@@ -12,3 +12,7 @@
   width: 100%;
   height: 100%;
 }
+
+.mine .adm-list-default .adm-list-body{
+  border: none !important;
+}

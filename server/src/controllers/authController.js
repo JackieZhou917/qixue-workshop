@@ -1,4 +1,4 @@
-import { findUserByAccount, createUser } from "../models/authModel.js"
+import { findUserByAccount, createUser, getUserInfoById } from "../models/authModel.js"
 import { createToken } from "../utils/jwt.js"
 import { generateCaptcha, verifyCaptcha } from "../utils/captcha.js"
 import bcrypt from 'bcrypt'
@@ -149,4 +149,29 @@ export async function refreshToken(ctx) {
       message: '请重新登录'
     }
   }
+}
+
+export async function getUserInfo(ctx) {
+  // console.log(ctx.userId);
+  const id = ctx.userId
+  try {
+    const res = await getUserInfoById(id)
+    console.log(res);
+    ctx.body = {
+      code: 1,
+      id: id,
+      create_time: res.create_time,
+      nickName: res.nickName,
+      avatar: res.avatar || '',
+      account: res.account
+    }
+    
+  } catch (error) {
+    ctx.status = 400
+    ctx.body = {
+      code: 0,
+      message: '查找用户数据失败'
+    }
+  }
+  
 }

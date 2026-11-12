@@ -18,3 +18,8 @@ export async function createUser({nickName, account, bcryptPassword, create_time
   }
   
 }
+
+export async function getUserInfoById(id) {
+ const [ rows ] = await db.execute('SELECT * FROM users WHERE id = ? LIMIT 1', [id])
+ return rows[0]
+}

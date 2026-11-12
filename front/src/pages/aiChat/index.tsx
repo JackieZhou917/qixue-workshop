@@ -172,7 +172,7 @@ export default function index() {
       </main>
       <footer className='p-4 border-t border-[#e0e0e0] bg-white'>
         <div className='flex items-center bg-[#f5f5f5] rounded-full p-2 gap-2'>
-          <textarea ref={inputRef} placeholder='请输入消息。。。' rows={1} onKeyDown={handleKeyDown} className='flex-1 border-none bg-transparent resize-none outline-none px-3 py-2 text-[15px] leading-relaxed max-h-[120px] overflow-y-auto'></textarea>
+          <textarea ref={inputRef} placeholder='请输入消息。。。' rows={1} onKeyDown={handleKeyDown} className='flex-1 border-none bg-transparent resize-none outline-none px-3 py-2 text-[15px] leading-relaxed max-h-30 overflow-y-auto'></textarea>
           <div className='flex gap-2'>
             <button className='w-10 h-10 rounded-full border-none flex items-center justify-center cursor-pointer transition-all duration-200 bg-[#e0e0e0] text-[#333]'>
               <i className="iconfont icon-yuyin text-xl!"></i>
