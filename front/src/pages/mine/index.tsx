@@ -70,7 +70,7 @@ export default function index() {
 
         <Card title="设置" headerStyle={{ height: '60px' }} className="shadow-[0_2px_12px_rgba(0,0,0,0.08)] rounded-2xl!">
           <List>
-            <List.Item prefix={<i className="iconfont icon-zhanghaoshezhi text-[#f49e3b] text-lg"></i>} onClick={() => navigate('/accountSetting')}>
+            <List.Item prefix={<i className="iconfont icon-zhanghaoshezhi text-[#f49e3b] text-lg"></i>} onClick={() => navigate('/account-setting')}>
               账号设置
             </List.Item>
             <List.Item prefix={<i className="iconfont icon-tongzhishezhi text-[#f49e3b] text-lg"></i>} onClick={() => { }}>

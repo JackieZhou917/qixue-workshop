@@ -8,6 +8,9 @@ import Mine from './pages/mine'
 import Recognition from './pages/recognition'
 import LearnWords from './pages/learnWords'
 import LearnPoems from './pages/learnPoems'
+import AccountSetting from './pages/accountSetting'
+
+
 
 export default function App() {
   return (
@@ -24,6 +27,7 @@ export default function App() {
           <Route path='/learn-poems' element={<LearnPoems />}></Route>
         </Route>
         <Route path='/ai-chat' element={<AiChat />}></Route>
+        <Route path='/account-setting' element={<AccountSetting />}></Route>
       </Routes>
     </BrowserRouter>
   )

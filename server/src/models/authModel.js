@@ -23,3 +23,14 @@ export async function getUserInfoById(id) {
  const [ rows ] = await db.execute('SELECT * FROM users WHERE id = ? LIMIT 1', [id])
  return rows[0]
 }
+
+export async function updateUserInfo(id, params) {
+  const allowdKey = ['avatar', 'nickName', 'password']
+  const currentKey = Object.keys(params)[0] // ['avatar']
+  if (allowdKey.includes(currentKey)) {
+    const [rows] = await db.execute(`UPDATE users SET ${currentKey} = ? WHERE id = ?`, [params[currentKey], id])
+    return rows
+  }
+
+  throw new Error('字段不允许修改')
+}

@@ -1,6 +1,6 @@
 import Router from 'koa-router'
 import { verifyToken } from '../utils/jwt.js'
-import { login, getCaptcha, register, refreshToken, getUserInfo } from '../controllers/authController.js'
+import { login, getCaptcha, register, refreshToken, getUserInfo, updateUser } from '../controllers/authController.js'
 
 const router = new Router({
   prefix: '/auth',  // 路由前缀
@@ -16,6 +16,8 @@ router.post('/register', register)
 router.post('/refresh', refreshToken)
 // 获取用户信息
 router.get('/info', verifyToken(), getUserInfo)
+// 更新用户头像
+router.post('/updateUser', verifyToken(), updateUser)
 
 
 export default router

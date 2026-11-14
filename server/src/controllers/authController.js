@@ -1,4 +1,4 @@
-import { findUserByAccount, createUser, getUserInfoById } from "../models/authModel.js"
+import { findUserByAccount, createUser, getUserInfoById, updateUserInfo } from "../models/authModel.js"
 import { createToken } from "../utils/jwt.js"
 import { generateCaptcha, verifyCaptcha } from "../utils/captcha.js"
 import bcrypt from 'bcrypt'
@@ -174,4 +174,25 @@ export async function getUserInfo(ctx) {
     }
   }
   
+}
+
+export async function updateUser(ctx) {
+  const id = ctx.userId
+  const params = ctx.request.body
+  
+  try {
+    const res = await updateUserInfo(id, params)
+    if (res.affectedRows) {
+      ctx.body = {
+        code: 1,
+        message: '更新成功'
+      }
+    }
+  } catch (error) {
+    ctx.status = 500
+    ctx.body = {
+      code: 0,
+      message: error
+    }
+  }
 }
