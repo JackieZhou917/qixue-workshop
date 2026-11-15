@@ -196,3 +196,51 @@ export async function updateUser(ctx) {
     }
   }
 }
+
+export async function updatePassword(ctx) {
+  const id = ctx.userId
+  const { oldPassword, newPassword } = ctx.request.body
+
+  // 校验旧密码是否正确
+  const user = await getUserInfoById(id)
+
+  const passwordIsMatch = await bcrypt.compare(oldPassword, user.password)
+
+  if (!passwordIsMatch) {
+    ctx.status = 400
+    ctx.body = {
+      code: 0,
+      message: '旧密码错误'
+    }
+    return
+  }
+
+  // 校验新密码是否与旧密码相同
+  if (newPassword === oldPassword) {
+    ctx.status = 400
+    ctx.body = {
+      code: 0,
+      message: '新密码不能与旧密码相同'
+    }
+    return
+  }
+
+  // 写入新密码
+  const bcryptNewPassword = await bcrypt.hash(newPassword, 10)
+  try {
+    const res = await updateUserInfo(id, {password: bcryptNewPassword})
+    if (res.affectedRows) {
+      ctx.body = {
+        code: 1,
+        message: '更新成功'
+      }
+    }
+  } catch (error) {
+    ctx.status = 500
+    ctx.body = {
+      code: 0,
+      message: error
+    }
+  }
+
+}
