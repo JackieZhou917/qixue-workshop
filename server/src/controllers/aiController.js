@@ -36,7 +36,8 @@ export async function aiChat(ctx) {
     },
     {
       headers: {
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${process.env.LLM_API_KEY}`,
+        'Content-Type': 'application/json',
       },
       responseType: 'stream', // 流式资源
       adapter: 'fetch' // 顶层配置！node生效
@@ -63,18 +64,20 @@ export async function aiChat(ctx) {
       const trimmed = line.trim()
       if (!trimmed) continue
 
+      // DeepSeek 返回标准 SSE 格式：每行为 "data: {JSON}"，结束标记为 "data: [DONE]"
+      if (!trimmed.startsWith('data:')) continue
+      const payload = trimmed.slice(5).trim()
+      if (!payload || payload === '[DONE]') continue
+
       try {
-        const chunkValueObj = JSON.parse(trimmed)
+        const chunkValueObj = JSON.parse(payload)
+        const delta = chunkValueObj.choices?.[0]?.delta ?? {}
 
         // \n\n 标准的SSE需要的换行
-        if (chunkValueObj.message.thinking) {
-          ctx.res.write(`data: ${chunkValueObj.message.thinking}\n\n`)
-        } else {
-          ctx.res.write(`data: ${chunkValueObj.message.content}\n\n`)
+        // 只输出正文内容，不输出思考内容（reasoning_content）
+        if (delta.content) {
+          ctx.res.write(`data: ${delta.content}\n\n`)
         }
-        // if (chunkValueObj.message.content) {
-        //   ctx.res.write(`data: ${chunkValueObj.message.content}\n\n`)
-        // }
       } catch (err) {
         console.error('解析 JSON 失败，原始数据:', line, err)
       }

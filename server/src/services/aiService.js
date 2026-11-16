@@ -8,7 +8,7 @@ export async function getRagHistory(message) {
   const ragRes = await rag.query(message)
   const queryMessages = []
   for (let item of ragRes) {
-    if (item.simularity > 0.7) {
+    if (item.simularity > 0.9) {
       queryMessages.push({ role: 'system', content: item.text })
     }
   }

@@ -63,27 +63,27 @@ export default function index() {
     source.addEventListener('message', (event) => {
       // console.log(event.data);  // 后端不断地返回数据
       if (!event.data) return
+      const chunk = event.data
 
-      setMessages((prevState) => {
-        if (assistantContent.current === '') {  // 后端返回第一个字符
-          setIsLoading(false)
-          assistantContent.current = 'assistant-' + Date.now() // 后端返回的第一个字符保存起来
-          return [...prevState, {
-            role: 'assistant',
-            content: event.data,
-            id: assistantContent.current,
-            timestamp: new Date().toLocaleString()
-          }]
-        }
-
-        // 将 messages 数组中最后一个对象的 content 拼接上当前后端返回的新字符
-        return prevState.map((item) => {
-          if (item.id === assistantContent.current) {
-            item.content += event.data
-          }
-          return item
-        })
-      })
+      // 分支判断和 ref 标记必须在事件回调里同步完成，不能放进 setState 的 updater 里
+      // （React 18 的 updater 在渲染阶段才执行，且必须是纯函数，否则会被重跑/丢弃导致时序错乱）
+      if (assistantContent.current === '') {  // 后端返回第一个字符
+        setIsLoading(false)
+        const id = 'assistant-' + Date.now()
+        assistantContent.current = id  // 事件发生时立即标记，后续 chunk 走拼接分支
+        setMessages((prevState) => [...prevState, {
+          role: 'assistant',
+          content: chunk,
+          id,
+          timestamp: new Date().toLocaleString()
+        }])
+      } else {
+        const id = assistantContent.current
+        // 纯函数 + 不可变更新：不直接修改 item，返回新对象
+        setMessages((prevState) => prevState.map((item) => (
+          item.id === id ? { ...item, content: item.content + chunk } : item
+        )))
+      }
 
       // 在消息不断加载时候，保持main容器滚动到最底部
       if (mainRef.current) {

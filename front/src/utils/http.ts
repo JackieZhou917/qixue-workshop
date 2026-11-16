@@ -1,7 +1,7 @@
 import axios, { AxiosError, type AxiosRequestConfig } from 'axios'
 import { Toast } from 'antd-mobile'
 
-axios.defaults.baseURL = 'http://localhost:3000'
+axios.defaults.baseURL = 'http://112.124.16.235:3000'
 axios.defaults.timeout = 150000    // 超出150秒没有响应，就认为请求失败
 axios.defaults.headers.common['Content-Type'] = 'application/json'  // 设置请求头，指定请求体为json格式
 
