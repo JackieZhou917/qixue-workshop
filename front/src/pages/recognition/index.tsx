@@ -12,7 +12,7 @@ interface RecognitionResult {
 
 export default function index() {
   const [recognitionResult, setRecognitionResult] = useState<RecognitionResult>({})
-  const audioRef = useRef(null)
+  const audioRef = useRef<HTMLAudioElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
 
   const onRecognition = async (image: File) => {
@@ -42,7 +42,7 @@ export default function index() {
     } catch (error) {
       Toast.show({
         icon: 'fail',
-        content: error.message
+        content: error instanceof Error ? error.message : '识别失败，请重试'
       })
     }
   }
@@ -54,11 +54,11 @@ export default function index() {
           <h2 className='text-lg font-bold text-[#333]'>识别结果：</h2>
           {
             isPlaying ?
-              (<div onClick={() => { audioRef.current.pause(); setIsPlaying(false) }}>
+              (<div onClick={() => { audioRef.current?.pause(); setIsPlaying(false) }}>
                 <i className="iconfont icon-zanting text-2xl! text-[#ff7a45]"></i>
               </div>) :
               (
-                <div onClick={() => { audioRef.current.play(); setIsPlaying(true)}}>
+                <div onClick={() => { audioRef.current?.play(); setIsPlaying(true)}}>
                   <i className="iconfont icon-bofang text-2xl! text-[#515151]"></i>
                 </div>
               )

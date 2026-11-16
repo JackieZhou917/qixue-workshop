@@ -12,10 +12,10 @@ interface Props {
 
 export default function index({ theme = 'default', handleByAI, children, title }: Props) {
   const navigate = useNavigate()
-  const imageInputRef = useRef(null)
-  const videoRef = useRef(null)
-  const canvasRef = useRef(null)
-  const [selectedImage, setSelectedImage] = useState(null)
+  const imageInputRef = useRef<HTMLInputElement>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [isTakingPhoto, setIsTakingPhoto] = useState(false)
 
   const themeConfig: Record<ThemeKey, { primary: string; gradient: string[] }> = {
@@ -32,7 +32,7 @@ export default function index({ theme = 'default', handleByAI, children, title }
 
   // 读取本地图片
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const image = e.target.files[0]
+    const image = e.target.files?.[0]
     if (image) {
       // 需要一个本地资源路径才能预览
       const imageUrl = URL.createObjectURL(image)
@@ -53,17 +53,20 @@ export default function index({ theme = 'default', handleByAI, children, title }
     setIsTakingPhoto(true)
     // 获取摄像头权限
     const stream = await navigator.mediaDevices.getUserMedia({ video: true })
-    videoRef.current.srcObject = stream
-    videoRef.current.play()
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream
+      videoRef.current.play()
+    }
   }
 
   // 关闭拍照界面
   const closeCamera = () => {
     setIsTakingPhoto(false)
     // 关闭视频流
-    videoRef.current.pause()
+    videoRef.current?.pause()
     // 让摄像头停止工作
-    videoRef.current.srcObject.getTracks().forEach(track => track.stop())
+    const stream = videoRef.current?.srcObject
+    if (stream instanceof MediaStream) stream.getTracks().forEach(track => track.stop())
 
   }
 
@@ -72,16 +75,19 @@ export default function index({ theme = 'default', handleByAI, children, title }
     // 将video播放的内容截屏保留
     // 将视频中的某一帧，绘制在画布上，再转为图片
     const canvas = canvasRef.current
+    const video = videoRef.current
+    if (!canvas || !video) return
     const ctx = canvas.getContext('2d')
-    canvas.width = videoRef.current.videoWidth
-    canvas.height = videoRef.current.videoHeight
-    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height)
+    if (!ctx) return
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
     // 关闭拍照界面, 停止摄像头工作
-    videoRef.current.pause()
-    videoRef.current.srcObject.getTracks().forEach(track => track.stop())
+    video.pause()
+    if (video.srcObject instanceof MediaStream) video.srcObject.getTracks().forEach(track => track.stop())
 
     // 得到一张图片
-    canvas.toBlob((blob) => {
+    canvas.toBlob((blob: Blob | null) => {
       if (blob) {
         const imageUrl = URL.createObjectURL(blob)
         // 预览
@@ -142,7 +148,7 @@ export default function index({ theme = 'default', handleByAI, children, title }
           </button>
           <button
             className="flex items-center justify-center gap-2 px-8 py-4 rounded-full text-lg font-semibold border-none cursor-pointer transition-all duration-300 ease min-w-37.5 bg-[#f5f5f5] text-[#444] shadow-[0_4px_12px_rgba(0,0,0,0.08)] hover:bg-[#e8e8e8] hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(0,0,0,0.12)] active:translate-y-0"
-            onClick={() => imageInputRef.current.click()}
+            onClick={() => imageInputRef.current?.click()}
           >
             <i className="iconfont icon-shangchuan text-2xl!"></i>
             上传图片

@@ -11,7 +11,7 @@ interface ChatMessage {
 
 export default function index() {
   const navigate = useNavigate()
-  const inputRef = useRef(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
   const [messages, setMessages] = useState<ChatMessage[]>([
     // {
     //   role: 'user',
@@ -34,10 +34,10 @@ export default function index() {
   ])
   const [isLoading, setIsLoading] = useState(false)
   const assistantContent = useRef('')
-  const mainRef = useRef(null)
+  const mainRef = useRef<HTMLElement>(null)
 
   const sendMessage = async () => {
-    const message = inputRef.current.value.trim()
+    const message = inputRef.current?.value.trim() ?? ''
     if (isLoading) return
     if (!message) {
       Toast.show({
@@ -56,7 +56,7 @@ export default function index() {
         timestamp: new Date().toLocaleString()
       }
     ])
-    inputRef.current.value = ''
+    if (inputRef.current) inputRef.current.value = ''
     setIsLoading(true)
     // 向LLM发送消息
     const source = new EventSource(`/api/ai/chat?message=${encodeURIComponent(message)}`, { withCredentials: true })

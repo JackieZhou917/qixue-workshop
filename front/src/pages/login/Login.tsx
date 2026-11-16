@@ -6,18 +6,22 @@ import { Md5 } from 'ts-md5'
 import { useNavigate } from 'react-router-dom'
 
 
-export default function Login({ user: { account, password}}) {
+interface Props {
+  user: { account: string, password: string }
+}
+
+export default function Login({ user: { account, password}}: Props) {
   const [loading, setLoading] = useState(false)
-  const accountRef = useRef(null)
-  const passwordRef = useRef(null)
+  const accountRef = useRef<HTMLInputElement>(null)
+  const passwordRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
 
 
   // 登录
   const login = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()  // 阻止默认行为
-    const account = accountRef.current.value
-    const password = passwordRef.current.value
+    const account = accountRef.current?.value ?? ''
+    const password = passwordRef.current?.value ?? ''
     // 手机号校验
     const phoneRegex = /^1[3-9]\d{9}$/
     const emailRegex = /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*$/
